@@ -1,8 +1,13 @@
 import {ITrainingAction, TrainingActionTypes} from '../actions/trainings';
 import ITraining from '../models/ITraining';
+import { RootState } from '../store/storeConfiguration';
 
-const initialState = {
-    items: [] as ITraining[]
+interface ITrainingState {
+    items: ITraining[]
+}
+
+const initialState: ITrainingState = {
+    items: []
 };
 
 export default (state = initialState, action: ITrainingAction) => {
@@ -47,3 +52,7 @@ export default (state = initialState, action: ITrainingAction) => {
             return state;
     }
 };
+
+// Getters
+export const getTrainings = (state: RootState): ITraining[] => state.trainings.items;
+export const getTraining = (state: RootState, id: number | string): ITraining | null => state.trainings.items.find((item: ITraining) => item.id === id) || null;
