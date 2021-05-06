@@ -1,5 +1,7 @@
+import ID from '../types/ID';
+
 export default interface ITraining {
-    id: number | string;
+    id: ID;
     distanceInKM: number;
     date: string;
     workoutType: string;

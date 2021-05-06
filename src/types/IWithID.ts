@@ -1,3 +1,5 @@
+import ID from './ID';
+
 export default interface IWithID {
-    id: number | string;
+    id: ID;
 }

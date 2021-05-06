@@ -1,6 +1,7 @@
-import {ITrainingAction, TrainingActionTypes} from '../actions/trainings';
-import ITraining from '../models/ITraining';
+import { ITrainingAction, TrainingActionTypes } from '../actions/trainings';
 import { RootState } from '../store/storeConfiguration';
+import ITraining from '../models/ITraining';
+import ID from '../types/ID';
 
 interface ITrainingState {
     items: ITraining[]
@@ -13,10 +14,10 @@ const initialState: ITrainingState = {
 export default (state = initialState, action: ITrainingAction) => {
     switch (action.type) {
         case TrainingActionTypes.FETCH_TRAININGS:
-            return {
-                ...state,
-                items: action.items
-            };
+            return { ...state, items: action.items };
+
+        case TrainingActionTypes.SET_TRAININGS:
+            return { ...state, items: action.items };
 
         case TrainingActionTypes.ADD_TRAINING:
             return {
@@ -48,6 +49,18 @@ export default (state = initialState, action: ITrainingAction) => {
                 )
             };
 
+        case TrainingActionTypes.SET_TRAINING_ID:
+            return {
+                ...state,
+                items: state.items.map(training => training.id === action.oldId
+                    ? {
+                        ...training,
+                        id: action.newId
+                    }
+                    : training
+                )
+            };
+
         default:
             return state;
     }
@@ -55,4 +68,4 @@ export default (state = initialState, action: ITrainingAction) => {
 
 // Getters
 export const getTrainings = (state: RootState): ITraining[] => state.trainings.items;
-export const getTraining = (state: RootState, id: number | string): ITraining | null => state.trainings.items.find((item: ITraining) => item.id === id) || null;
+export const getTraining = (state: RootState, id: ID): ITraining | null => state.trainings.items.find((item: ITraining) => item.id === id) || null;
