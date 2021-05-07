@@ -12,6 +12,7 @@
     "@types/react-dom": "^17.0.3",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
+    "font-awesome": "^4.7.0",
     "formik": "^2.2.6",
     "highcharts": "^9.0.1",
     "lodash-es": "^4.17.21",
@@ -52,6 +53,7 @@
     ]
   },
   "devDependencies": {
-    "@types/lodash-es": "^4.17.4"
+    "@types/lodash-es": "^4.17.4",
+    "node-sass": "^5.0.0"
   }
 }

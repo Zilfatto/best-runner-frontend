@@ -1,3 +1,5 @@
+import Key from './Key';
+
 export default interface IWithKey {
-    key: number | string | Symbol;
+    key: Key;
 }

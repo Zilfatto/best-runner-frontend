@@ -1,14 +1,17 @@
-import { ITrainingAction, TrainingActionTypes } from '../actions/trainings';
-import { RootState } from '../store/storeConfiguration';
+import {ITrainingAction, TrainingActionTypes} from '../actions/trainings';
+import {RootState} from '../store/storeConfiguration';
+import {WorkoutTypeSelectValues} from '../utils/trainings';
 import ITraining from '../models/ITraining';
 import ID from '../types/ID';
 
 interface ITrainingState {
-    items: ITraining[]
+    items: ITraining[];
+    workoutTypeFilter: WorkoutTypeSelectValues;
 }
 
 const initialState: ITrainingState = {
-    items: []
+    items: [],
+    workoutTypeFilter: 'all'
 };
 
 export default (state = initialState, action: ITrainingAction) => {
@@ -61,6 +64,12 @@ export default (state = initialState, action: ITrainingAction) => {
                 )
             };
 
+        case TrainingActionTypes.SET_WORKOUT_TYPE_FILTER:
+            return {
+                ...state,
+                workoutTypeFilter: action.workoutTypeFilter
+            };
+
         default:
             return state;
     }
@@ -69,3 +78,4 @@ export default (state = initialState, action: ITrainingAction) => {
 // Getters
 export const getTrainings = (state: RootState): ITraining[] => state.trainings.items;
 export const getTraining = (state: RootState, id: ID): ITraining | null => state.trainings.items.find((item: ITraining) => item.id === id) || null;
+export const getWorkoutTypeFilter = (state: RootState): WorkoutTypeSelectValues => state.trainings.workoutTypeFilter;

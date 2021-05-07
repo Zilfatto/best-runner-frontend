@@ -5,6 +5,7 @@ import { AppDispatch, AppGetState } from '../store/storeConfiguration'
 import { AxiosError } from 'axios';
 import ITraining from '../models/ITraining';
 import ID from '../types/ID';
+import {WorkoutTypeSelectValues} from '../utils/trainings';
 
 // Interface for action in a training reducer
 export interface ITrainingAction extends Action<TrainingActionTypes> {
@@ -19,7 +20,8 @@ export enum TrainingActionTypes {
     ADD_TRAINING = 'ADD_TRAINING',
     DELETE_TRAINING = 'DELETE_TRAINING',
     EDIT_TRAINING = 'EDIT_TRAINING',
-    SET_TRAINING_ID = ' SET_TRAINING_ID'
+    SET_TRAINING_ID = ' SET_TRAINING_ID',
+    SET_WORKOUT_TYPE_FILTER = 'SET_WORKOUT_TYPE_FILTER'
 }
 
 let TRAINING_TEMP_ID = -1;
@@ -134,3 +136,9 @@ export const deleteTraining = (id: ID) => (dispatch: AppDispatch, getState: AppG
             setTrainings(oldState.trainings.items);
         });
 };
+
+// Change a filter for trainings
+export const setWorkoutTypeFilter = (workoutTypeFilter: WorkoutTypeSelectValues) => ({
+    type: TrainingActionTypes.SET_WORKOUT_TYPE_FILTER,
+    workoutTypeFilter
+});
