@@ -1,17 +1,20 @@
-import {ITrainingAction, TrainingActionTypes} from '../actions/trainings';
-import {RootState} from '../store/storeConfiguration';
-import {WorkoutTypeSelectValues} from '../utils/trainings';
+import moment from 'moment';
+import { WorkoutTypeSelectValues } from '../utils/trainings';
+import { ITrainingAction, TrainingActionTypes } from '../actions/trainings';
+import { RootState } from '../store/storeConfiguration';
 import ITraining from '../models/ITraining';
 import ID from '../types/ID';
 
 interface ITrainingState {
     items: ITraining[];
     workoutTypeFilter: WorkoutTypeSelectValues;
+    chartWeek: string;
 }
 
 const initialState: ITrainingState = {
     items: [],
-    workoutTypeFilter: 'all'
+    workoutTypeFilter: 'all',
+    chartWeek: moment().format(moment.HTML5_FMT.WEEK)
 };
 
 export default (state = initialState, action: ITrainingAction) => {
@@ -70,6 +73,12 @@ export default (state = initialState, action: ITrainingAction) => {
                 workoutTypeFilter: action.workoutTypeFilter
             };
 
+        case TrainingActionTypes.SET_CHART_WEEK:
+            return {
+                ...state,
+                chartWeek: action.chartWeek
+            };
+
         default:
             return state;
     }
@@ -79,3 +88,4 @@ export default (state = initialState, action: ITrainingAction) => {
 export const getTrainings = (state: RootState): ITraining[] => state.trainings.items;
 export const getTraining = (state: RootState, id: ID): ITraining | null => state.trainings.items.find((item: ITraining) => item.id === id) || null;
 export const getWorkoutTypeFilter = (state: RootState): WorkoutTypeSelectValues => state.trainings.workoutTypeFilter;
+export const getChartWeek = (state: RootState): string => state.trainings.chartWeek;

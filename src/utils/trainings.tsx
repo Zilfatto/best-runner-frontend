@@ -24,6 +24,43 @@ export const constructColumnsForTrainingTable = (workoutTypeSelectElement: React
     ];
 }
 
+export const createTrainingWeekChartStructure = () => ({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Covered Distances of Different Workout Types Within a Week'
+        },
+        subtitle: {
+            text: 'Source: imagination.com'
+        },
+        xAxis: {
+            categories: [],
+            crosshair: true
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Distances sum (km)'
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: []
+    });
+
 // Create a selection for filtering genres
 export const createWorkoutTypeSelection = (value: WorkoutTypeSelectValues = 'all', handler: (val: WorkoutTypeSelectValues) => void, items: WorkoutTypeSelectItems) => (
     <select defaultValue={value} onChange={(e) => handler(e.target.value as WorkoutTypeSelectValues)}>

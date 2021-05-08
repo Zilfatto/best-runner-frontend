@@ -1,6 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import TrainingWeekChart from './views/TrainingWeekChart';
 import SmartTable from '../../shared/SmartTable';
+import { Container, ButtonToggle } from 'reactstrap';
 import { fetchTrainings, setWorkoutTypeFilter } from '../../actions/trainings';
 import { getTrainings, getWorkoutTypeFilter } from '../../reducers/trainings';
 import {
@@ -18,11 +20,11 @@ const Trainings = () => {
     const workoutTypeFilter = useSelector(getWorkoutTypeFilter);
     // Filter trainings by a selected workout type filter
     const filteredTrainings = filterTrainings(trainings, workoutTypeFilter);
-
+    const [chartIsOpen, setChartIsOpen] = useState(false);
     // Selection for filtering trainings
     const workoutTypeSelect = createWorkoutTypeSelection(
         workoutTypeFilter,
-        handleSelectedWorkoutTypeChange,
+        workoutTypeChangeHandler,
         [ ...WorkoutType.getSelectionItems(), { value: 'all', label: 'All' } ]
         );
 
@@ -32,12 +34,26 @@ const Trainings = () => {
     }, []);
 
     // Handle workout type selection
-    function handleSelectedWorkoutTypeChange(value: WorkoutTypeSelectValues) {
+    function workoutTypeChangeHandler(value: WorkoutTypeSelectValues) {
         dispatch(setWorkoutTypeFilter(value));
+    }
+
+    function chartVisibilityToggle() {
+        setChartIsOpen(chartIsOpen => !chartIsOpen);
     }
 
     return (
         <section>
+            <Container fluid={true}>
+                <ButtonToggle
+                    color={'info'}
+                    size={'lg'}
+                    onClick={chartVisibilityToggle}
+                >
+                    Show training week chart
+                </ButtonToggle>
+            </Container>
+            <TrainingWeekChart trainings={trainings} isOpen={chartIsOpen} />
             <SmartTable
                 columns={constructColumnsForTrainingTable(workoutTypeSelect)}
                 items={filteredTrainings}

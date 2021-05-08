@@ -1,5 +1,5 @@
 // Tuple for a better TS support over working on Workout type enum
-const workoutTuple = ['walking', 'running', 'cycling', 'skiing'] as const;
+export const workoutTuple = ['walking', 'running', 'cycling', 'skiing'] as const;
 export type WorkoutTupleType = typeof workoutTuple[number];
 
 // Define a structure of returning items for select or dropdown fields

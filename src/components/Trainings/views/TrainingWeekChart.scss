@@ -1,0 +1,32 @@
+.chart-week-interval {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.chart-week-date {
+  font-size: 18px;
+}
+
+.prev-arrow, .next-arrow {
+  border: 2px solid #e9e9e9;
+  border-radius: 50%;
+  margin: 0 10px;
+  padding: 12px 8px;
+  cursor: pointer;
+}
+
+.prev-arrow:hover, .next-arrow:hover {
+  border-color: #727272;
+  background-color: #fbfbfb;
+}
+
+.prev-arrow:after {
+  content: '←';
+  font-size: 26px;
+}
+
+.next-arrow:after {
+  content: '→';
+  font-size: 26px;
+}

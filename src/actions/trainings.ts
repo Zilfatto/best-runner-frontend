@@ -5,7 +5,7 @@ import { AppDispatch, AppGetState } from '../store/storeConfiguration'
 import { AxiosError } from 'axios';
 import ITraining from '../models/ITraining';
 import ID from '../types/ID';
-import {WorkoutTypeSelectValues} from '../utils/trainings';
+import { WorkoutTypeSelectValues } from '../utils/trainings';
 
 // Interface for action in a training reducer
 export interface ITrainingAction extends Action<TrainingActionTypes> {
@@ -21,25 +21,20 @@ export enum TrainingActionTypes {
     DELETE_TRAINING = 'DELETE_TRAINING',
     EDIT_TRAINING = 'EDIT_TRAINING',
     SET_TRAINING_ID = ' SET_TRAINING_ID',
-    SET_WORKOUT_TYPE_FILTER = 'SET_WORKOUT_TYPE_FILTER'
+    SET_WORKOUT_TYPE_FILTER = 'SET_WORKOUT_TYPE_FILTER',
+    SET_CHART_WEEK = 'SET_CHART_WEEK'
 }
 
 let TRAINING_TEMP_ID = -1;
 
 const generateTrainingEndpoint = (id: ID) => `trainings/${id}`;
 
+
 // Action creator for rolling back to the previous trainings state
-const setTrainings = (items: ITraining[]) => ({
-    type: TrainingActionTypes.SET_TRAININGS,
-    items
-});
+const setTrainings = (items: ITraining[]) => ({ type: TrainingActionTypes.SET_TRAININGS, items });
 
 // Action creator for updating a training id after it's een received from the server
-const setTrainingId = (oldId: ID, newId: ID) => ({
-    type: TrainingActionTypes.SET_TRAINING_ID,
-    oldId,
-    newId
-});
+const setTrainingId = (oldId: ID, newId: ID) => ({ type: TrainingActionTypes.SET_TRAINING_ID, oldId, newId });
 
 // Trainings fetch
 export const fetchTrainings = () => (dispatch: AppDispatch, getState: AppGetState) => {
@@ -142,3 +137,5 @@ export const setWorkoutTypeFilter = (workoutTypeFilter: WorkoutTypeSelectValues)
     type: TrainingActionTypes.SET_WORKOUT_TYPE_FILTER,
     workoutTypeFilter
 });
+
+export const setChartWeek = (chartWeek: string) => ({ type: TrainingActionTypes.SET_CHART_WEEK, chartWeek })

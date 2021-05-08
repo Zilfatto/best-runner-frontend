@@ -25,7 +25,7 @@ export interface IColumn<T extends object> extends IWithKey {
 }
 
 // For forcing a developer be consistent with provided objects and column data indexes
-interface ITableProps<T extends object> {
+interface ISmartTableProps<T extends object> {
     columns: IColumn<T>[];
     items: (T & IWithID)[];
     showDelete?: boolean;
@@ -33,7 +33,7 @@ interface ITableProps<T extends object> {
     onItemDelete?(id: ID): void;
 }
 
-const SmartTable = <T extends object>({ columns, items, showDelete, onRowClick, onItemDelete }: PropsWithChildren<ITableProps<T>>) => {
+const SmartTable = <T extends object>({ columns, items, showDelete, onRowClick, onItemDelete }: PropsWithChildren<ISmartTableProps<T>>) => {
     const [sortingColumn, setSortingColumn] = useState<ISortingColumn>({ key: '', order: '' });
     // Apply memoization for avoiding unnecessary resorting based on the same data and filters
     const sortedItems = useMemo(() => sortItems(), [sortingColumn]);
