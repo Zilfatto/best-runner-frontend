@@ -6,6 +6,7 @@ import IWithKey from '../../types/IWIthKey';
 import IWithID from '../../types/IWithID';
 import ID from '../../types/ID';
 import Key from '../../types/Key';
+import './SmartTable.scss';
 
 // Sort orders for table items
 const sortOrders = ['asc', 'desc', ''] as const;
@@ -36,7 +37,7 @@ interface ISmartTableProps<T extends object> {
 const SmartTable = <T extends object>({ columns, items, showDelete, onRowClick, onItemDelete }: PropsWithChildren<ISmartTableProps<T>>) => {
     const [sortingColumn, setSortingColumn] = useState<ISortingColumn>({ key: '', order: '' });
     // Apply memoization for avoiding unnecessary resorting based on the same data and filters
-    const sortedItems = useMemo(() => sortItems(), [sortingColumn]);
+    const sortedItems = useMemo(sortItems, [sortItems]);
 
     function sortableColumnClickHandler(columnKey: Key) {
         // If a user has clicked on a new column, then apply the first of sort orders
@@ -50,7 +51,7 @@ const SmartTable = <T extends object>({ columns, items, showDelete, onRowClick, 
     function findNextSortOrder() {
         const orderIndex = sortOrders.findIndex(order => order === sortingColumn.order);
         // Figure out the next applying sort order using remainder operator
-        const newOrderIndex = orderIndex + 1 % sortOrders.length;
+        const newOrderIndex = (orderIndex + 1) % sortOrders.length;
         return sortOrders[newOrderIndex];
     }
 

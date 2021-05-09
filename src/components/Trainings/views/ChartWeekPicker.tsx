@@ -13,7 +13,7 @@ const ChartWeekPicker: FC = () => {
     useEffect(() => {
         // Update a value of a week input on each chart week change
         weekInput.current!.value = chartWeek;
-    }, [chartWeek]);
+    }, [weekInput, chartWeek]);
 
     function chartWeekChangeHandler() {
         if (weekInput.current!.checkValidity()) {
@@ -25,18 +25,17 @@ const ChartWeekPicker: FC = () => {
     }
 
     return (
-        <div>
-            <InputGroup aria-errormessage={chartWeekInputError}>
-                <Input
-                    type='week'
-                    innerRef={weekInput}
-                    defaultValue={chartWeek}
-                />
-                <InputGroupAddon addonType="append">
-                    <Button onClick={chartWeekChangeHandler}>Search</Button>
-                </InputGroupAddon>
-            </InputGroup>
-        </div>
+        <InputGroup>
+            <Input
+                type='week'
+                innerRef={weekInput}
+                defaultValue={chartWeek}
+            />
+            <InputGroupAddon addonType="append">
+                <Button onClick={chartWeekChangeHandler}>Search by Week</Button>
+            </InputGroupAddon>
+            {chartWeekInputError && <span style={{ color: '#e50000' }}>{chartWeekInputError}</span>}
+        </InputGroup>
     );
 };
 

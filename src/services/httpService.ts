@@ -1,9 +1,9 @@
 import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
-import { apiUrl } from '../config.json';
 
+axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.defaults.headers.put['Content-Type'] = 'application/json';
 axios.interceptors.response.use(response => response, httpErrorHandler);
-axios.defaults.baseURL = apiUrl;
 
 // Handle unexpected errors
 function httpErrorHandler(error: AxiosError) {

@@ -1,6 +1,6 @@
 import React, { FC, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Collapse } from 'reactstrap';
+import { Collapse, Row, Col } from 'reactstrap';
 import ChartWeekPicker from './ChartWeekPicker';
 import HighchartsReact from 'highcharts-react-official';
 import * as HighCharts from 'highcharts';
@@ -12,6 +12,7 @@ import _zipObject from 'lodash-es/zipObject';
 import _cloneDeep from 'lodash-es/cloneDeep';
 import ITraining from '../../../models/ITraining';
 import WorkoutType, { workoutTuple, WorkoutTupleType } from '../../../enums/WorkoutType';
+import './TrainingWeekChart.scss';
 
 type WorkoutTypeToDistanceMap = {
     [key in WorkoutTupleType]: number;
@@ -46,26 +47,26 @@ const TrainingWeekChart: FC<ITrainingWeekChartProps> = ({ trainings, isOpen }) =
     const weekStart = chartWeekDates[0];
     const weekEnd = chartWeekDates[chartWeekDates.length - 1];
     // Use memoized value for avoiding complex logic to calculate distance sum of trainings on different dates of a specified week
-    const dateToDistanceSumMap = useMemo(() => mapChartWeekDatesToTrainingDistancesSum(), [trainings, chartWeek]);
+    const dateToDistanceSumMap = useMemo(mapChartWeekDatesToTrainingDistancesSum, [mapChartWeekDatesToTrainingDistancesSum]);
     // Update chart only if week or trainings have changed
-    const chartOptions = useMemo(() => createChartOptions(), [chartWeek, dateToDistanceSumMap]);
+    const chartOptions = useMemo(createChartOptions, [createChartOptions]);
 
     // Connect chart week dates to covered distances sum of every workout type of a particular date
     function mapChartWeekDatesToTrainingDistancesSum() {
-        const dateDistanceSumMapFrame = generateDateToDistanceSumMapFrame();
-        return sumUpChartWeekTrainingDistancesByDates(dateDistanceSumMapFrame);
+        const dateToDistanceSumMapFrame = generateDateToDistanceSumMapFrame();
+        return sumUpChartWeekTrainingDistancesByDates(dateToDistanceSumMapFrame);
     }
 
     // Calculate distances covered by every workout ype for each date
-    function sumUpChartWeekTrainingDistancesByDates(dateDistanceSumMap: IDateToChartSeriesMap) {
+    function sumUpChartWeekTrainingDistancesByDates(dateToDistanceSumMapFrame: IDateToChartSeriesMap) {
         trainings.forEach(training => {
             // Skip trainings that are not in the chart week
             if (training.date >= weekStart && training.date <= weekEnd) {
                 // Sum up distances of all trainings of a particular date separately for each workout type
-                dateToDistanceSumMap[training.date][training.workoutType] += training.distanceInKM;
+                dateToDistanceSumMapFrame[training.date][training.workoutType] += training.distanceInKM;
             }
         });
-        return dateDistanceSumMap;
+        return dateToDistanceSumMapFrame;
     }
 
     function generateDateToDistanceSumMapFrame(): IDateToChartSeriesMap {
@@ -73,7 +74,12 @@ const TrainingWeekChart: FC<ITrainingWeekChartProps> = ({ trainings, isOpen }) =
         // Fill workout types with default value
         workoutTuple.forEach(workoutType => chartSeriesToDistanceMap[workoutType] = 0);
         // Create and an object map with dates as keys and Series of workout types as values
-        return _zipObject(chartWeekDates, Array(WEEK_INTERVAL).fill(_cloneDeep(chartSeriesToDistanceMap)));
+        return _zipObject(
+            chartWeekDates,
+            Array(WEEK_INTERVAL)
+                .fill('')
+                .map(elem => _cloneDeep(chartSeriesToDistanceMap) as WorkoutTypeToDistanceMap)
+        );
     }
 
     function createChartOptions() {
@@ -107,7 +113,7 @@ const TrainingWeekChart: FC<ITrainingWeekChartProps> = ({ trainings, isOpen }) =
         // Date of a day before week start
         const dateMoment = moment(chartWeek, moment.HTML5_FMT.WEEK).subtract(1, 'day');
         // Create an array of dates from a start to an end of a chart week
-        return Array(WEEK_INTERVAL).fill(dateMoment.add(1, 'day').format(moment.HTML5_FMT.DATE));
+        return Array(WEEK_INTERVAL).fill('').map(item => dateMoment.add(1, 'day').format(moment.HTML5_FMT.DATE));
     }
 
     function chartWeekChangeHandler(weekShift: number = 0) {
@@ -117,12 +123,12 @@ const TrainingWeekChart: FC<ITrainingWeekChartProps> = ({ trainings, isOpen }) =
     }
 
     return (
-        <Collapse isOpen={isOpen}>
+        <Collapse isOpen={isOpen} className='mb-5'>
             <section className='chart-week-interval'>
-                <div>
+                <div className='dates-container'>
                     <span onClick={() => chartWeekChangeHandler(-1)} className='prev-arrow' />
                     <span className='chart-week-date'>{weekStart}</span>
-                    <span> - </span>
+                    <span> &#9866; </span>
                     <span className='chart-week-date'>{weekEnd}</span>
                     <span onClick={() => chartWeekChangeHandler(1)} className='next-arrow' />
                 </div>
@@ -131,7 +137,11 @@ const TrainingWeekChart: FC<ITrainingWeekChartProps> = ({ trainings, isOpen }) =
                 highcharts={HighCharts}
                 options={chartOptions}
             />
-            <ChartWeekPicker />
+            <Row className='justify-content-around'>
+                <Col xs={4}>
+                    <ChartWeekPicker />
+                </Col>
+            </Row>
         </Collapse>
     );
 };

@@ -27,8 +27,8 @@ const Head = <T extends object>({ columns, sortingColumn, onSortableColumnClick,
                             </span>
                             {column.sortable && sortingColumn.key === column.key && sortingColumn.order && (
                                 sortingColumn.order === 'asc'
-                                    ? <i className="fa fa-sort-asc">{''}</i>
-                                    : <i className="fa fa-sort-desc">{''}</i>
+                                    ? <i className="fa fa-sort-asc"></i>
+                                    : <i className="fa fa-sort-desc"></i>
                             )}
                         </th>
                     )),

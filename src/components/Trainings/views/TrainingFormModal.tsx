@@ -1,4 +1,5 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useEffect, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 import {
     Modal,
     ModalHeader,
@@ -17,6 +18,7 @@ import _isEmpty from 'lodash-es/isEmpty';
 import { toast } from 'react-toastify';
 import WorkoutType, { WorkoutTupleType } from '../../../enums/WorkoutType';
 import ITraining from '../../../models/ITraining';
+import './TrainingFormModal.scss';
 
 type TrainingInputErrorsMap = {
     [prop in keyof Training]: string[];
@@ -29,11 +31,28 @@ interface ITrainingFormModalProps {
 }
 
 const TrainingFormModal: FC<ITrainingFormModalProps> = ({ isOpen, modalVisibilityToggle, editingTraining }) => {
-    const [date, setDate] = useState(editingTraining?.date || '');
-    const [workoutType, setWorkoutType] = useState<WorkoutTupleType>(editingTraining?.workoutType || 'running');
-    const [distanceInKM, setDistanceInKM] = useState(editingTraining ? String(editingTraining.distanceInKM.toString) : '');
-    const [comment, setComment] = useState(editingTraining?.comment || '');
+    const dispatch = useDispatch();
+    const [date, setDate] = useState('');
+    const [workoutType, setWorkoutType] = useState<WorkoutTupleType>('running');
+    const [distanceInKM, setDistanceInKM] = useState('');
+    const [comment, setComment] = useState('');
     const [inputsToErrorsMap, setInputsToErrorsMap] = useState<TrainingInputErrorsMap>({ date: [], workoutType: [], distanceInKM: [], comment: [] })
+
+    // Update function on training or isOpen change
+    const populateFormInputWIthData = useCallback(() => {
+        setDate(editingTraining?.date || '');
+        setWorkoutType(editingTraining?.workoutType || 'running');
+        setDistanceInKM(editingTraining ? String(editingTraining!.distanceInKM) : '');
+        setComment(editingTraining?.comment || '');
+    }, [editingTraining, isOpen]);
+
+    useEffect(() => {
+        populateFormInputWIthData();
+
+        return () => {
+            cleanUpErrors();
+        }
+    }, [populateFormInputWIthData]);
 
     function saveTrainingHandler() {
         const training = new Training(date, workoutType, +distanceInKM, comment);
@@ -45,22 +64,22 @@ const TrainingFormModal: FC<ITrainingFormModalProps> = ({ isOpen, modalVisibilit
             toast.success('Saved!');
             modalVisibilityToggle();
             return editingTraining
-                ? updateTraining({ ...training, id: editingTraining.id })
-                : createTraining(training);
+                ? dispatch(updateTraining({ ...training, id: editingTraining.id }))
+                : dispatch(createTraining(training));
         });
     }
 
     function showValidationErrors(errors: ValidationError[]) {
-        const inputsToErrorsMap: Partial<TrainingInputErrorsMap> = {};
+        const newInputsToErrorsMap: Partial<TrainingInputErrorsMap> = {};
         // Find errors for each training field
         (Object.keys(inputsToErrorsMap) as (keyof TrainingInputErrorsMap)[]).forEach(inputName => {
             const inputError = errors.find(error => error.property === inputName);
             // Set errors for a particular field if there are any, otherwise just clean them up
-            inputsToErrorsMap[inputName] = inputError?.constraints ? Object.values(inputError.constraints) : [];
+            newInputsToErrorsMap[inputName] = inputError?.constraints ? Object.values(inputError.constraints) : [];
         });
 
         // Update inputs to errors map
-        setInputsToErrorsMap(inputsToErrorsMap as TrainingInputErrorsMap);
+        setInputsToErrorsMap(newInputsToErrorsMap as TrainingInputErrorsMap);
         toast.warn('Some of the entered values are invalid!');
     }
 
@@ -80,7 +99,7 @@ const TrainingFormModal: FC<ITrainingFormModalProps> = ({ isOpen, modalVisibilit
     }
 
     return (
-        <Modal isOpen={isOpen} onClosed={cleanUpErrors}>
+        <Modal isOpen={isOpen}>
             <ModalHeader toggle={modalVisibilityToggle}>
                 {editingTraining ? 'Editing the training' : 'New training'}
             </ModalHeader>
@@ -111,7 +130,7 @@ const TrainingFormModal: FC<ITrainingFormModalProps> = ({ isOpen, modalVisibilit
                             type='select'
                             name='workoutType'
                             placeholder='Select workout type'
-                            onSelect={(event) => setWorkoutType(event.currentTarget.value as WorkoutTupleType)}
+                            onChange={(event) => setWorkoutType(event.target.value as WorkoutTupleType)}
                         >
                             {generateWorkoutTypeSelectOptions()}
                         </Input>

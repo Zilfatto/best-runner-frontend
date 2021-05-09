@@ -27,7 +27,7 @@ export enum TrainingActionTypes {
 
 let TRAINING_TEMP_ID = -1;
 
-const generateTrainingEndpoint = (id: ID) => `trainings/${id}`;
+const generateTrainingEndpoint = (id: ID) => `/api/trainings/${id}`;
 
 
 // Action creator for rolling back to the previous trainings state
@@ -38,7 +38,7 @@ const setTrainingId = (oldId: ID, newId: ID) => ({ type: TrainingActionTypes.SET
 
 // Trainings fetch
 export const fetchTrainings = () => (dispatch: AppDispatch, getState: AppGetState) => {
-    return http.get<ITraining[]>('/trainings')
+    return http.get<ITraining[]>('/api/trainings')
         .then(response => response.data)
         .then(items => dispatch({
             type: TrainingActionTypes.FETCH_TRAININGS,
@@ -47,7 +47,7 @@ export const fetchTrainings = () => (dispatch: AppDispatch, getState: AppGetStat
         .catch((error: AxiosError) => {
             // Show an error to a user about failed training fetch
             console.error(error.message);
-            toast.error('Could not load trainings from the server');
+            toast.error(`Could not load trainings from the server. ${error.response?.data}`);
         });
 };
 
@@ -58,7 +58,7 @@ export const fetchTraining = (id: ID) => (dispatch: AppDispatch, getState: AppGe
         .catch((error: AxiosError) => {
             // Show an error about not successful training fetch
             console.error(error.message);
-            toast.error(`Could not load trainings from the server. ${error.message}`);
+            toast.error(`Could not load a training from the server. ${error.response?.data}`);
         });
 };
 
@@ -77,16 +77,16 @@ export const createTraining = (trainingData: Omit<ITraining, 'id'>) => (dispatch
     });
 
     // Make a request to the server for saving it on the backend
-    return http.post<ITraining>('/trainings')
+    return http.post<ITraining>('api/trainings', trainingData)
         .then(response => response.data)
         // Then after receiving a response from the server set a real id of a training
         .then(item => dispatch(setTrainingId(tmpId, item.id)))
         .catch((error: AxiosError) => {
             // Show an error to a user
             console.error(error.message);
-            toast.error(`Could not create a training. ${error.message}`);
+            toast.error(`Could not create a training. ${error.response?.data}`);
             // Roll back to the previous state
-            setTrainings(oldState.trainings.items);
+            dispatch(setTrainings(oldState.trainings.items));
         });
 };
 
@@ -94,6 +94,7 @@ export const createTraining = (trainingData: Omit<ITraining, 'id'>) => (dispatch
 export const updateTraining = (updatedTraining: ITraining) => (dispatch: AppDispatch, getState: AppGetState) => {
     const oldState = getState();
 
+    console.log('UPDATED from ACTION: ', updatedTraining);
     // Dispatch an updated to Redux to show a new version strait away
     dispatch({
         type: TrainingActionTypes.UPDATE_TRAINING,
@@ -101,13 +102,13 @@ export const updateTraining = (updatedTraining: ITraining) => (dispatch: AppDisp
     });
 
     // Then save changes on the server
-    return http.put(generateTrainingEndpoint(updatedTraining.id))
+    return http.put(generateTrainingEndpoint(updatedTraining.id), updatedTraining)
         .catch((error: AxiosError) => {
             // Show an error to a user
             console.error(error.message);
-            toast.error(`Could not update a training. ${error.message}`);
+            toast.error(`Could not update a training. ${error.response?.data}`);
             // Roll back to the previous state
-            setTrainings(oldState.trainings.items);
+            dispatch(setTrainings(oldState.trainings.items));
         });
 };
 
@@ -122,13 +123,13 @@ export const deleteTraining = (id: ID) => (dispatch: AppDispatch, getState: AppG
     });
 
     // Then delete a training from the server
-    return http.put(generateTrainingEndpoint(id))
+    return http.delete(generateTrainingEndpoint(id))
         .catch((error: AxiosError) => {
             // Show an error to a user
             console.error(error.message);
-            toast.error(`Could not delete a training. ${error.message}`);
+            toast.error(`Could not delete a training. ${error.response?.data}`);
             // Roll back to the previous state
-            setTrainings(oldState.trainings.items);
+            dispatch(setTrainings(oldState.trainings.items));
         });
 };
 

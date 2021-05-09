@@ -1,18 +1,19 @@
 .chart-week-interval {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin: 20px 0;
 }
 
 .chart-week-date {
   font-size: 18px;
+  margin: 0 5px;
 }
 
 .prev-arrow, .next-arrow {
   border: 2px solid #e9e9e9;
   border-radius: 50%;
   margin: 0 10px;
-  padding: 12px 8px;
+  padding: 12px 12px;
   cursor: pointer;
 }
 

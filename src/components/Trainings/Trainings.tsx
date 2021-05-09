@@ -33,7 +33,7 @@ const Trainings = () => {
     useEffect(() => {
         // Fetch trainings after a component has been mounted
         dispatch(fetchTrainings());
-    }, []);
+    }, [dispatch]);
 
     // Handle workout type selection
     function workoutTypeChangeHandler(value: WorkoutTypeSelectValues) {
@@ -68,7 +68,7 @@ const Trainings = () => {
 
     return (
         <Container fluid={true}>
-            <Row className='justify-content-between'>
+            <Row className='justify-content-between px-3 py-3'>
                 <ButtonToggle
                     color='info'
                     size='lg'
@@ -78,12 +78,12 @@ const Trainings = () => {
                 </ButtonToggle>
                 <Button
                     size='lg'
-                    obClick={openTrainingCreatingFormHandler}
+                    onClick={openTrainingCreatingFormHandler}
                 >
                     Create new training
                 </Button>
             </Row>
-            <Row className='justify-content-space-around'>
+            <Row className='justify-content-around'>
                 <Col xs={10}>
                     <TrainingWeekChart trainings={trainings} isOpen={chartIsOpen} />
                     <TrainingFormModal

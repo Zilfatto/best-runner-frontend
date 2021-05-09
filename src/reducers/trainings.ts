@@ -17,7 +17,7 @@ const initialState: ITrainingState = {
     chartWeek: moment().format(moment.HTML5_FMT.WEEK)
 };
 
-export default (state = initialState, action: ITrainingAction) => {
+const trainings = (state = initialState, action: ITrainingAction) => {
     switch (action.type) {
         case TrainingActionTypes.FETCH_TRAININGS:
             return { ...state, items: action.items };
@@ -43,13 +43,13 @@ export default (state = initialState, action: ITrainingAction) => {
         case TrainingActionTypes.UPDATE_TRAINING:
             return {
                 ...state,
-                items: state.items.map(training => training.id === action.id
+                items: state.items.map(training => training.id === action.item.id
                     ? {
                         ...training,
-                        distanceInKM: action.distanceInKM,
-                        date: action.date,
-                        workoutType: action.workoutType,
-                        comment: action.comment
+                        distanceInKM: action.item.distanceInKM,
+                        date: action.item.date,
+                        workoutType: action.item.workoutType,
+                        comment: action.item.comment
                     }
                     : training
                 )
@@ -83,6 +83,8 @@ export default (state = initialState, action: ITrainingAction) => {
             return state;
     }
 };
+
+export default trainings;
 
 // Getters
 export const getTrainings = (state: RootState): ITraining[] => state.trainings.items;
