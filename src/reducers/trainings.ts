@@ -25,7 +25,7 @@ export default (state = initialState, action: ITrainingAction) => {
         case TrainingActionTypes.SET_TRAININGS:
             return { ...state, items: action.items };
 
-        case TrainingActionTypes.ADD_TRAINING:
+        case TrainingActionTypes.CREATE_TRAINING:
             return {
                 ...state,
                 items: [
@@ -40,7 +40,7 @@ export default (state = initialState, action: ITrainingAction) => {
                 items: state.items.filter(training => training.id !== action.id)
             };
 
-        case TrainingActionTypes.EDIT_TRAINING:
+        case TrainingActionTypes.UPDATE_TRAINING:
             return {
                 ...state,
                 items: state.items.map(training => training.id === action.id

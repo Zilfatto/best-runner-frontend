@@ -12,6 +12,7 @@
     "@types/react-dom": "^17.0.3",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
+    "class-validator": "^0.13.1",
     "font-awesome": "^4.7.0",
     "formik": "^2.2.6",
     "highcharts": "^9.1.0",

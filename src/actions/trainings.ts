@@ -17,9 +17,9 @@ export interface ITrainingAction extends Action<TrainingActionTypes> {
 export enum TrainingActionTypes {
     FETCH_TRAININGS = 'FETCH_TRAININGS',
     SET_TRAININGS = 'SET_TRAININGS',
-    ADD_TRAINING = 'ADD_TRAINING',
+    CREATE_TRAINING = 'CREATE_TRAINING',
     DELETE_TRAINING = 'DELETE_TRAINING',
-    EDIT_TRAINING = 'EDIT_TRAINING',
+    UPDATE_TRAINING = 'UPDATE_TRAINING',
     SET_TRAINING_ID = ' SET_TRAINING_ID',
     SET_WORKOUT_TYPE_FILTER = 'SET_WORKOUT_TYPE_FILTER',
     SET_CHART_WEEK = 'SET_CHART_WEEK'
@@ -62,14 +62,14 @@ export const fetchTraining = (id: ID) => (dispatch: AppDispatch, getState: AppGe
         });
 };
 
-// Add a new training
-export const addTraining = (trainingData: Omit<ITraining, 'id'>) => (dispatch: AppDispatch, getState: AppGetState) => {
+// Create a training
+export const createTraining = (trainingData: Omit<ITraining, 'id'>) => (dispatch: AppDispatch, getState: AppGetState) => {
     const oldState = getState();
     const tmpId = TRAINING_TEMP_ID--;
 
     // Add a training to Redux first
     dispatch({
-        type: TrainingActionTypes.ADD_TRAINING,
+        type: TrainingActionTypes.CREATE_TRAINING,
         item: {
             ...trainingData,
             id: tmpId
@@ -84,7 +84,7 @@ export const addTraining = (trainingData: Omit<ITraining, 'id'>) => (dispatch: A
         .catch((error: AxiosError) => {
             // Show an error to a user
             console.error(error.message);
-            toast.error(`Could not add a training. ${error.message}`);
+            toast.error(`Could not create a training. ${error.message}`);
             // Roll back to the previous state
             setTrainings(oldState.trainings.items);
         });
@@ -96,7 +96,7 @@ export const updateTraining = (updatedTraining: ITraining) => (dispatch: AppDisp
 
     // Dispatch an updated to Redux to show a new version strait away
     dispatch({
-        type: TrainingActionTypes.EDIT_TRAINING,
+        type: TrainingActionTypes.UPDATE_TRAINING,
         item: updatedTraining
     });
 

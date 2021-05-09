@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import { Input } from 'reactstrap';
 import ITraining from '../models/ITraining';
 import { IColumn } from '../shared/SmartTable/SmartTable';
 import { WorkoutTupleType } from '../enums/WorkoutType';
@@ -63,9 +64,9 @@ export const createTrainingWeekChartStructure = () => ({
 
 // Create a selection for filtering genres
 export const createWorkoutTypeSelection = (value: WorkoutTypeSelectValues = 'all', handler: (val: WorkoutTypeSelectValues) => void, items: WorkoutTypeSelectItems) => (
-    <select defaultValue={value} onChange={(e) => handler(e.target.value as WorkoutTypeSelectValues)}>
-        {items.map((item, index) => <option value={item.value} key={item.value} >{item.label}</option>)}
-    </select>
+    <Input type={'select'} value={value} onChange={(e) => handler(e.target.value as WorkoutTypeSelectValues)}>
+        {items.map((item, index) => <option value={item.value} key={index} >{item.label}</option>)}
+    </Input>
 );
 
 // Apply workout type filter to trainings
