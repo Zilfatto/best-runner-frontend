@@ -94,7 +94,6 @@ export const createTraining = (trainingData: Omit<ITraining, 'id'>) => (dispatch
 export const updateTraining = (updatedTraining: ITraining) => (dispatch: AppDispatch, getState: AppGetState) => {
     const oldState = getState();
 
-    console.log('UPDATED from ACTION: ', updatedTraining);
     // Dispatch an updated to Redux to show a new version strait away
     dispatch({
         type: TrainingActionTypes.UPDATE_TRAINING,

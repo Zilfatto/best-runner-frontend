@@ -1,10 +1,10 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useMemo, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Collapse, Row, Col } from 'reactstrap';
 import ChartWeekPicker from './ChartWeekPicker';
 import HighchartsReact from 'highcharts-react-official';
 import * as HighCharts from 'highcharts';
-import { createTrainingWeekChartStructure } from '../../../utils/trainings';
+import { createTrainingWeekChartStructure, convertDatesToDayNames } from '../../../utils/trainings';
 import { getChartWeek } from '../../../reducers/trainings';
 import { setChartWeek } from '../../../actions/trainings';
 import moment from 'moment';
@@ -46,30 +46,8 @@ const TrainingWeekChart: FC<ITrainingWeekChartProps> = ({ trainings, isOpen }) =
     // Pick up first and last week dates
     const weekStart = chartWeekDates[0];
     const weekEnd = chartWeekDates[chartWeekDates.length - 1];
-    // Use memoized value for avoiding complex logic to calculate distance sum of trainings on different dates of a specified week
-    const dateToDistanceSumMap = useMemo(mapChartWeekDatesToTrainingDistancesSum, [mapChartWeekDatesToTrainingDistancesSum]);
-    // Update chart only if week or trainings have changed
-    const chartOptions = useMemo(createChartOptions, [createChartOptions]);
-
-    // Connect chart week dates to covered distances sum of every workout type of a particular date
-    function mapChartWeekDatesToTrainingDistancesSum() {
-        const dateToDistanceSumMapFrame = generateDateToDistanceSumMapFrame();
-        return sumUpChartWeekTrainingDistancesByDates(dateToDistanceSumMapFrame);
-    }
-
-    // Calculate distances covered by every workout ype for each date
-    function sumUpChartWeekTrainingDistancesByDates(dateToDistanceSumMapFrame: IDateToChartSeriesMap) {
-        trainings.forEach(training => {
-            // Skip trainings that are not in the chart week
-            if (training.date >= weekStart && training.date <= weekEnd) {
-                // Sum up distances of all trainings of a particular date separately for each workout type
-                dateToDistanceSumMapFrame[training.date][training.workoutType] += training.distanceInKM;
-            }
-        });
-        return dateToDistanceSumMapFrame;
-    }
-
-    function generateDateToDistanceSumMapFrame(): IDateToChartSeriesMap {
+    // Create new function for creating date to distances sum map frame only if chart week Dates have changed
+    const generateDateToDistanceSumMapFrame = useCallback((): IDateToChartSeriesMap => {
         const chartSeriesToDistanceMap: Partial<WorkoutTypeToDistanceMap> = {};
         // Fill workout types with default value
         workoutTuple.forEach(workoutType => chartSeriesToDistanceMap[workoutType] = 0);
@@ -80,20 +58,28 @@ const TrainingWeekChart: FC<ITrainingWeekChartProps> = ({ trainings, isOpen }) =
                 .fill('')
                 .map(elem => _cloneDeep(chartSeriesToDistanceMap) as WorkoutTypeToDistanceMap)
         );
-    }
+    }, [chartWeekDates]);
 
-    function createChartOptions() {
-        const chartStructure = createTrainingWeekChartStructure();
-        const daysOfChartWeek = convertDatesToDayNames(chartWeekDates);
-        const chartSeries = generateChartSeries();
-        return populateChartStructure(chartStructure, daysOfChartWeek, chartSeries);
-    }
+    // Use memoized function for calculating distances covered by every workout type for each date, if nothing what is used was changed
+    const sumUpChartWeekTrainingDistancesByDates = useCallback((dateToDistanceSumMapFrame: IDateToChartSeriesMap) => {
+        trainings.forEach(training => {
+            // Skip trainings that are not in the chart week
+            if (training.date >= weekStart && training.date <= weekEnd) {
+                // Sum up distances of all trainings of a particular date separately for each workout type
+                dateToDistanceSumMapFrame[training.date][training.workoutType] += training.distanceInKM;
+            }
+        });
+        return dateToDistanceSumMapFrame;
+    }, [trainings, weekStart, weekEnd]);
 
-    function convertDatesToDayNames(dates: string[]) {
-        return dates.map(date => moment(date).format('ddd'));
-    }
+    // Use memoized value for avoiding complex logic to calculate distance sum of trainings on different dates of a specified week
+    const dateToDistanceSumMap = useMemo(
+        mapChartWeekDatesToTrainingDistancesSum,
+        [generateDateToDistanceSumMapFrame, sumUpChartWeekTrainingDistancesByDates]
+    );
 
-    function generateChartSeries(): IChartSeries[] {
+    // Create columns with data for each day of a chart week
+    const generateChartSeries = useCallback((): IChartSeries[] => {
         const workoutTypeLabels = WorkoutType.getLabels();
         // Create series of all workouts for displaying in the chart
         return workoutTuple.map(workoutType => ({
@@ -101,6 +87,25 @@ const TrainingWeekChart: FC<ITrainingWeekChartProps> = ({ trainings, isOpen }) =
             // Create an array of every chart week day mapped to workout distances sum
             data: chartWeekDates.map(date => dateToDistanceSumMap[date][workoutType])
         }));
+    }, [chartWeekDates, dateToDistanceSumMap]);
+
+    // Update chart only if week or trainings have changed
+    const chartOptions = useMemo(
+        createChartOptions,
+        [chartWeekDates, generateChartSeries]
+    );
+
+    // Connect chart week dates to covered distances sum of every workout type of a particular date
+    function mapChartWeekDatesToTrainingDistancesSum() {
+        const dateToDistanceSumMapFrame = generateDateToDistanceSumMapFrame();
+        return sumUpChartWeekTrainingDistancesByDates(dateToDistanceSumMapFrame);
+    }
+
+    function createChartOptions() {
+        const chartStructure = createTrainingWeekChartStructure();
+        const daysOfChartWeek = convertDatesToDayNames(chartWeekDates);
+        const chartSeries = generateChartSeries();
+        return populateChartStructure(chartStructure, daysOfChartWeek, chartSeries);
     }
 
     function populateChartStructure<T extends INeedfulChartStructureOptions>(chartStructure: T, columnNames: string[], series: IChartSeries[]) {

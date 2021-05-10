@@ -3,6 +3,7 @@ import { Input } from 'reactstrap';
 import ITraining from '../models/ITraining';
 import { IColumn } from '../shared/SmartTable/SmartTable';
 import { WorkoutTupleType } from '../enums/WorkoutType';
+import moment from 'moment';
 
 // Modified types for working with selection and adding an All option
 export type WorkoutTypeSelectValues = WorkoutTupleType | 'all';
@@ -61,6 +62,8 @@ export const createTrainingWeekChartStructure = () => ({
         },
         series: []
     });
+
+export const convertDatesToDayNames = (dates: string[]) => dates.map(date => moment(date).format('ddd'));
 
 // Create a selection for filtering genres
 export const createWorkoutTypeSelection = (value: WorkoutTypeSelectValues = 'all', handler: (val: WorkoutTypeSelectValues) => void, items: WorkoutTypeSelectItems) => (

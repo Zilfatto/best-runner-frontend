@@ -1,4 +1,10 @@
-import React, { PropsWithChildren, ReactNode, useState, useMemo } from 'react';
+import React, {
+    PropsWithChildren,
+    ReactNode,
+    useState,
+    useMemo,
+    useCallback
+} from 'react';
 import { Table } from 'reactstrap';
 import Head from './views/Head';
 import Row from './views/Row';
@@ -37,23 +43,23 @@ interface ISmartTableProps<T extends object> {
 const SmartTable = <T extends object>({ columns, items, showDelete, onRowClick, onItemDelete }: PropsWithChildren<ISmartTableProps<T>>) => {
     const [sortingColumn, setSortingColumn] = useState<ISortingColumn>({ key: '', order: '' });
     // Apply memoization for avoiding unnecessary resorting based on the same data and filters
-    const sortedItems = useMemo(sortItems, [sortItems]);
+    const sortedItems = useMemo(sortItems, [sortingColumn, columns, items]);
 
-    function sortableColumnClickHandler(columnKey: Key) {
+    const findNextSortOrder = useCallback(() => {
+        const orderIndex = sortOrders.findIndex(order => order === sortingColumn.order);
+        // Figure out the next applying sort order using remainder operator
+        const newOrderIndex = (orderIndex + 1) % sortOrders.length;
+        return sortOrders[newOrderIndex];
+    }, [sortingColumn.order]);
+
+    const sortableColumnClickHandler = useCallback((columnKey: Key) => {
         // If a user has clicked on a new column, then apply the first of sort orders
         // otherwise it needs to find the next sort order
         setSortingColumn(sortingColumn => ({
             key: columnKey,
             order: columnKey === sortingColumn.key ? findNextSortOrder() : sortOrders[0]
         }));
-    }
-
-    function findNextSortOrder() {
-        const orderIndex = sortOrders.findIndex(order => order === sortingColumn.order);
-        // Figure out the next applying sort order using remainder operator
-        const newOrderIndex = (orderIndex + 1) % sortOrders.length;
-        return sortOrders[newOrderIndex];
-    }
+    }, [findNextSortOrder]);
 
     function sortItems() {
         if (!sortingColumn.key || !sortingColumn.order) {

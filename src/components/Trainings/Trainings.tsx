@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import TrainingWeekChart from './views/TrainingWeekChart';
 import TrainingFormModal from './views/TrainingFormModal';
@@ -30,6 +30,30 @@ const Trainings = () => {
         [ ...WorkoutType.getSelectionItems(), { value: 'all', label: 'All' } ]
         );
 
+    const formModalVisibilityToggle = useCallback(() => {
+        setFormModalIsOpen(formModalIsOpen => !formModalIsOpen);
+    }, []);
+
+    const openTrainingFormModal = useCallback(() => {
+        setFormModalIsOpen(true);
+    }, []);
+
+    const openTrainingEditingFormHandler = useCallback((training: ITraining) => {
+        setEditingTraining(training);
+        openTrainingFormModal();
+    }, [openTrainingFormModal]);
+
+    const openTrainingCreatingFormHandler = useCallback(() => {
+        setEditingTraining(null);
+        openTrainingFormModal();
+    }, [openTrainingFormModal]);
+
+    const deleteTrainingHandler = useCallback((id: ID) => dispatch(deleteTraining(id)), [dispatch]);
+
+    const chartVisibilityToggle = useCallback(() => {
+        setChartIsOpen(chartIsOpen => !chartIsOpen);
+    }, []);
+
     useEffect(() => {
         // Fetch trainings after a component has been mounted
         dispatch(fetchTrainings());
@@ -38,32 +62,6 @@ const Trainings = () => {
     // Handle workout type selection
     function workoutTypeChangeHandler(value: WorkoutTypeSelectValues) {
         dispatch(setWorkoutTypeFilter(value));
-    }
-
-    function chartVisibilityToggle() {
-        setChartIsOpen(chartIsOpen => !chartIsOpen);
-    }
-
-    function formModalVisibilityToggle() {
-        setFormModalIsOpen(formModalIsOpen => !formModalIsOpen);
-    }
-
-    function openTrainingEditingFormHandler(training: ITraining) {
-        setEditingTraining(training);
-        openTrainingFormModal();
-    }
-
-    function openTrainingCreatingFormHandler() {
-        setEditingTraining(null);
-        openTrainingFormModal();
-    }
-
-    function openTrainingFormModal() {
-        setFormModalIsOpen(true);
-    }
-
-    function deleteTrainingHandler(id: ID) {
-        dispatch(deleteTraining(id));
     }
 
     return (

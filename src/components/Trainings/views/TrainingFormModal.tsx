@@ -44,7 +44,7 @@ const TrainingFormModal: FC<ITrainingFormModalProps> = ({ isOpen, modalVisibilit
         setWorkoutType(editingTraining?.workoutType || 'running');
         setDistanceInKM(editingTraining ? String(editingTraining!.distanceInKM) : '');
         setComment(editingTraining?.comment || '');
-    }, [editingTraining, isOpen]);
+    }, [editingTraining]);
 
     useEffect(() => {
         populateFormInputWIthData();
@@ -52,7 +52,7 @@ const TrainingFormModal: FC<ITrainingFormModalProps> = ({ isOpen, modalVisibilit
         return () => {
             cleanUpErrors();
         }
-    }, [populateFormInputWIthData]);
+    }, [populateFormInputWIthData, isOpen]);
 
     function saveTrainingHandler() {
         const training = new Training(date, workoutType, +distanceInKM, comment);
