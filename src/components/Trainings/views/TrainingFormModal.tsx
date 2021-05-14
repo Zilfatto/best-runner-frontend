@@ -13,14 +13,15 @@ import {
 } from 'reactstrap';
 import { createTraining, updateTraining } from '../../../actions/trainings';
 import Training, { validatorOptions } from '../../../utils/Validation/training';
-import { validate, ValidationError } from 'class-validator';
+import { generateWorkoutTypeSelectOptions, showValidationErrors } from '../../../utils/trainings';
+import { validate } from 'class-validator';
 import _isEmpty from 'lodash-es/isEmpty';
 import { toast } from 'react-toastify';
-import WorkoutType, { WorkoutTupleType } from '../../../enums/WorkoutType';
+import { WorkoutTupleType } from '../../../enums/WorkoutType';
 import ITraining from '../../../models/ITraining';
 import './TrainingFormModal.scss';
 
-type TrainingInputErrorsMap = {
+export type TrainingInputErrorsMap = {
     [prop in keyof Training]: string[];
 };
 
@@ -58,7 +59,7 @@ const TrainingFormModal: FC<ITrainingFormModalProps> = ({ isOpen, modalVisibilit
         const training = new Training(date, workoutType, +distanceInKM, comment);
         validate(training, validatorOptions).then(errors => {
             if (!_isEmpty(errors)) {
-                return showValidationErrors(errors);
+                return showValidationErrors(errors, inputsToErrorsMap, setInputsToErrorsMap);
             }
 
             toast.success('Saved!');
@@ -69,20 +70,6 @@ const TrainingFormModal: FC<ITrainingFormModalProps> = ({ isOpen, modalVisibilit
         });
     }
 
-    function showValidationErrors(errors: ValidationError[]) {
-        const newInputsToErrorsMap: Partial<TrainingInputErrorsMap> = {};
-        // Find errors for each training field
-        (Object.keys(inputsToErrorsMap) as (keyof TrainingInputErrorsMap)[]).forEach(inputName => {
-            const inputError = errors.find(error => error.property === inputName);
-            // Set errors for a particular field if there are any, otherwise just clean them up
-            newInputsToErrorsMap[inputName] = inputError?.constraints ? Object.values(inputError.constraints) : [];
-        });
-
-        // Update inputs to errors map
-        setInputsToErrorsMap(newInputsToErrorsMap as TrainingInputErrorsMap);
-        toast.warn('Some of the entered values are invalid!');
-    }
-
     function cleanUpErrors() {
         setInputsToErrorsMap({
            date: [],
@@ -90,12 +77,6 @@ const TrainingFormModal: FC<ITrainingFormModalProps> = ({ isOpen, modalVisibilit
            distanceInKM: [],
            comment: []
         });
-    }
-
-    function generateWorkoutTypeSelectOptions() {
-        return WorkoutType.getSelectionItems().map((item, index) => (
-            <option value={item.value} key={index} >{item.label}</option>
-        ));
     }
 
     return (
@@ -118,7 +99,7 @@ const TrainingFormModal: FC<ITrainingFormModalProps> = ({ isOpen, modalVisibilit
                         </Input>
                         {!_isEmpty(inputsToErrorsMap['date']) && (
                             <p className='input-errors-container'>
-                                {inputsToErrorsMap['date'].map(inputError => <span className='input-error'>{inputError}</span>)}
+                                {inputsToErrorsMap['date'].map(inputError => <span key={inputError} className='input-error'>{inputError}</span>)}
                             </p>
                         )}
                     </FormGroup>
@@ -136,7 +117,7 @@ const TrainingFormModal: FC<ITrainingFormModalProps> = ({ isOpen, modalVisibilit
                         </Input>
                         {!_isEmpty(inputsToErrorsMap['workoutType']) && (
                             <p className='input-errors-container'>
-                                {inputsToErrorsMap['workoutType'].map(inputError => <span className='input-error'>{inputError}</span>)}
+                                {inputsToErrorsMap['workoutType'].map(inputError => <span key={inputError} className='input-error'>{inputError}</span>)}
                             </p>
                         )}
                     </FormGroup>
@@ -154,7 +135,7 @@ const TrainingFormModal: FC<ITrainingFormModalProps> = ({ isOpen, modalVisibilit
                         </Input>
                         {!_isEmpty(inputsToErrorsMap['distanceInKM']) && (
                             <p className='input-errors-container'>
-                                {inputsToErrorsMap['distanceInKM'].map(inputError => <span className='input-error'>{inputError}</span>)}
+                                {inputsToErrorsMap['distanceInKM'].map(inputError => <span key={inputError} className='input-error'>{inputError}</span>)}
                             </p>
                         )}
                     </FormGroup>
@@ -171,7 +152,7 @@ const TrainingFormModal: FC<ITrainingFormModalProps> = ({ isOpen, modalVisibilit
                         </Input>
                         {!_isEmpty(inputsToErrorsMap['comment']) && (
                             <p className='input-errors-container'>
-                                {inputsToErrorsMap['comment'].map(inputError => <span className='input-error'>{inputError}</span>)}
+                                {inputsToErrorsMap['comment'].map(inputError => <span key={inputError} className='input-error'>{inputError}</span>)}
                             </p>
                         )}
                     </FormGroup>

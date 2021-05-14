@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import TrainingWeekChart from './views/TrainingWeekChart';
 import TrainingFormModal from './views/TrainingFormModal';
@@ -21,7 +21,10 @@ const Trainings = () => {
     const trainings = useSelector(getTrainings);
     const workoutTypeFilter = useSelector(getWorkoutTypeFilter);
     // Filter trainings by a selected workout type filter
-    const filteredTrainings = filterTrainings(trainings, workoutTypeFilter);
+    const filteredTrainings = useMemo(
+        () => filterTrainings(trainings, workoutTypeFilter),
+        [trainings, workoutTypeFilter]
+    );
     const [chartIsOpen, setChartIsOpen] = useState(false);
     const [formModalIsOpen, setFormModalIsOpen] = useState(false);
     const [editingTraining, setEditingTraining] = useState<ITraining | null>(null);
